@@ -11,7 +11,7 @@ In a terminal or on vs code:
 BACKEND
 In a terminal or on vs code: 
 1. cd backend
-2. python -m venv venv
+2. python -m venv venv   <-- if venv folder not present run this.
 3. .\venv\Scripts\activate
 4. python .\manage.py runserver
     -clicking on the url will lead to a url not supported currently,
