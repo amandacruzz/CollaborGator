@@ -103,7 +103,7 @@ const LandingPage = () => {
           className="bg-blue-600 text-white hover:bg-blue-700 transition-colors px-6 py-3 rounded-full font-semibold"
           whileHover={{ scale: 1.1 }} // Scale up on hover
         >
-          Join Us Now!
+          Join Us Now Please!
         </motion.button>
       </motion.div>
 
