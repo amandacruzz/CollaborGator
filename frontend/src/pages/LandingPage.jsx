@@ -5,6 +5,11 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const LandingPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+
   const scrollToSection = (id) => {
     const section = document.getElementById(id);
     if (section) {
@@ -12,10 +17,41 @@ const LandingPage = () => {
     }
   };
 
+  // Function to handle login
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/accounts/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,  // Corrected from `username` to `email`
+          password: password,
+        }),
+      });
+      
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("Login successful");
+        // Redirect or additional actions can go here
+      } else {
+        setError(data.error || 'An error occurred');
+      }
+    } catch (error) {
+      setError("Network error. Please try again.");
+    }
+  };
+
   return (
     <>
       <Header />
-      
+
       {/* Hero Section */}
       <motion.div
         className="h-screen flex flex-col justify-center items-center bg-gradient-to-b from-blue-500 to-blue-700 text-white text-center"
@@ -49,16 +85,20 @@ const LandingPage = () => {
       >
         <h2 className="text-3xl font-bold mb-4">Sign In or Create an Account</h2>
         <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
-          <form className="flex flex-col space-y-4">
+          <form onSubmit={handleLogin} className="flex flex-col space-y-4">
             <input
               type="email"
               placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
               required
             />
             <input
               type="password"
               placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
               required
             />
@@ -69,17 +109,9 @@ const LandingPage = () => {
             >
               Sign In
             </motion.button>
-            <div className="text-center">
-              <p className="text-sm text-gray-600">or</p>
-              <motion.button 
-                type="button" 
-                className="bg-red-500 text-white hover:bg-red-600 transition-colors px-4 py-2 rounded-lg font-semibold mt-2"
-                whileHover={{ scale: 1.05 }} // Slightly scale on hover
-              >
-                Sign In with Google
-              </motion.button>
-            </div>
           </form>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
+          {message && <p className="text-green-500 mt-2">{message}</p>}
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">Don't have an account? <a href="/register" className="text-blue-600 hover:underline">Create one</a></p>
           </div>
