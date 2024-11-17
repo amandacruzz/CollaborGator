@@ -13,7 +13,7 @@ const LandingPage = () => {
   };
 
   return (
-    <>
+    <> 
       <Header />
       
       {/* Hero Section */}
