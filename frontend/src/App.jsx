@@ -24,3 +24,5 @@ const App = () => {
 };
 
 export default App;
+
+// this is the central area of the webapp, the core

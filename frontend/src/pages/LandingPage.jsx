@@ -4,6 +4,7 @@ import '../index.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+
 const LandingPage = () => {
   const scrollToSection = (id) => {
     const section = document.getElementById(id);
