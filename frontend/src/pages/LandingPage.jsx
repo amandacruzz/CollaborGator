@@ -4,6 +4,7 @@ import '../index.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+// landing page
 const LandingPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,7 +50,7 @@ const LandingPage = () => {
   };
 
   return (
-    <>
+    <> 
       <Header />
 
       {/* Hero Section */}

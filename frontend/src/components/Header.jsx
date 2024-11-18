@@ -2,7 +2,7 @@ import React from 'react';
 import '../index.css';
 import { Link } from 'react-router-dom';
 
-
+// header
 const Header = () => {
     return (
       <nav className="bg-white shadow-md sticky top-0 z-10">

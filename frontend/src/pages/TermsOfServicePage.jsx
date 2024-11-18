@@ -3,6 +3,7 @@ import '../index.css';
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 
+// terms of service page
 const TermsOfServicePage = () => {
     return (
         <>
