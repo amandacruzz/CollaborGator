@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
+// projects page
 const ProjectsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-100">
