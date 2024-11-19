@@ -1,4 +1,4 @@
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from '../supabaseClient';
 
 const Login = () => {
   const handleLogin = async () => {
