@@ -1,30 +1,31 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import React from "react";
+import { Container, Grid, Card, CardContent, Typography } from "@mui/material";
+import Navbar from "../components/Navbar";
+import useFetchProjects from "../hooks/useFetchProjects";
 
 const Home = () => {
-  const [projects, setProjects] = useState([]);
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      const { data, error } = await supabase.from('projects').select('*');
-      if (error) console.error('Error fetching projects:', error);
-      else setProjects(data);
-    };
-
-    fetchProjects();
-  }, []);
+  const { projects, loading, error } = useFetchProjects();
 
   return (
     <div>
-      <h1>Explore Projects</h1>
-      <div>
-        {projects.map(project => (
-          <div key={project.id}>
-            <h3>{project.title}</h3>
-            <p>{project.description}</p>
-          </div>
-        ))}
-      </div>
+      <Navbar />
+      <Container sx={{ mt: 4 }}>
+        <Typography variant="h4" gutterBottom>Explore Projects</Typography>
+        {loading && <Typography>Loading projects...</Typography>}
+        {error && <Typography color="error">Error: {error}</Typography>}
+        <Grid container spacing={4}>
+          {projects.map((project) => (
+            <Grid item xs={12} sm={6} md={4} key={project.id}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">{project.title}</Typography>
+                  <Typography variant="body2" color="textSecondary">{project.description}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
     </div>
   );
 };
