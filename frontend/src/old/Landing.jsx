@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion'; // Import motion from framer-motion
 import '../index.css';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+
 
 const LandingPage = () => {
   const scrollToSection = (id) => {

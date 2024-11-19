@@ -1,12 +1,9 @@
 import React from 'react';
-import Header from '../components/Header'
-import Footer from '../components/Footer'
+
 
 const ProjectsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-gray-100">
-      {/* Navbar */}
-      <Header />
 
       {/* Search Bar */}
       <div className="container mx-auto mt-8 px-4">
