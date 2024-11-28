@@ -1,13 +1,25 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Box, Button, Avatar, IconButton } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Message, PostAdd, AccountCircle } from "@mui/icons-material";
-
+import { useGetUserProfile } from "../hooks/useGetUserProfile";
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Navbar = () => {
+	const navigate = useNavigate();
 	const { user, signOut } = useAuth();
-  
+	const { profile, loading, error, updateProfile } = useGetUserProfile();
+
+	const signOutAndRedirect = async () => {
+		try {
+		  await signOut(); // Perform sign-out logic
+		  navigate('/'); // Navigate to the home page after sign-out
+		} catch (error) {
+		  console.error('Error signing out:', error);
+		}
+	  };
+
 	return (
 	  <AppBar position="static" sx={{ backgroundColor: "#2E3B55" }}>
 		<Toolbar sx={{ justifyContent: "space-between", padding: "0 24px" }}>
@@ -70,29 +82,35 @@ const Navbar = () => {
 				  }}
 				>
 				  <PostAdd />
-				</IconButton>
-				<Avatar
-				  alt={user.email}
-				  src={user.avatar_url}
-				  sx={{
-					ml: 2,
-					cursor: "pointer",
-					"&:hover": {
-					  border: "2px solid #BB86FC", // Border on hover for avatar
-					},
-				  }}
-				/>
+				</IconButton>	
+				{loading ? (
+					<CircularProgress color="primary" />
+				) : (
+					<Link to="/profile" style={{ textDecoration: "none" }}>
+						<Avatar
+							alt={profile.email}
+							src={profile.avatar_url}
+							sx={{
+							ml: 2,
+							cursor: "pointer",
+							"&:hover": {
+								border: "2px solid #BB86FC", // Border on hover for avatar
+							},
+							}}
+						/>
+					</Link>
+				)}
 				<Button
-				  onClick={signOut}
-				  color="inherit"
-				  sx={{
-					ml: 2,
-					"&:hover": {
-					  color: "#BB86FC",
-					},
-				  }}
+					onClick={signOutAndRedirect} // Use the sign-out and redirect function
+					color="inherit"
+					sx={{
+						ml: 2,
+						"&:hover": {
+						color: "#BB86FC",
+						},
+					}}
 				>
-				  Log Out
+					Log Out
 				</Button>
 			  </>
 			) : (
