@@ -77,7 +77,7 @@ const Home = () => {
                   <Button
                     size="small"
                     component="a"
-                    href={`/projects/${project.id}`}
+                    href={`/project/${project.id}`}
                     sx={{
                       backgroundColor: "#BB86FC",
                       color: "#fff",

@@ -9,6 +9,8 @@ import PostProject from './pages/PostProject';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 
+import ProjectPage from './pages/ProjectPage';
+
 const AppRouter = () => (
   <Router>
     <Routes>
@@ -19,8 +21,11 @@ const AppRouter = () => (
 	    <Route path="/explore" element={<Explore />} />
       <Route path="/messages" element={<Messages />} />
 	    <Route path="/post-project" element={<PostProject />} />
-      <Route path="/profile" element={<Profile />} />
+      {/* <Route path="/profile" element={<Profile />} /> */}
+      <Route path="/profile/:userId" element={<Profile />} />
       <Route path="/edit-profile" element={<EditProfile />} />
+
+      <Route path="/project/:projectId" element={<ProjectPage />} />
     </Routes>
   </Router>
 );

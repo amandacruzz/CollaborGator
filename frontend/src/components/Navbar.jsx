@@ -86,7 +86,10 @@ const Navbar = () => {
 				{loading ? (
 					<CircularProgress color="primary" />
 				) : (
-					<Link to="/profile" style={{ textDecoration: "none" }}>
+					<Link
+						to={`/profile/${profile?.id}`} // Dynamic link to user's profile
+						style={{ textDecoration: "none" }}
+					>
 						<Avatar
 							alt={profile.email}
 							src={profile.avatar_url}
