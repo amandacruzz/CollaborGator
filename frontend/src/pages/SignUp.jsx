@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { TextField, Button, Typography, Box, CircularProgress } from '@mui/material';
 import { useNavigate } from "react-router-dom";
-import supabase from "../supabaseClient"; // Make sure to import your supabase client
+import axios from "axios"; // Ensure axios is imported
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState(""); // Added username state
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -16,17 +17,17 @@ const SignUp = () => {
     setError(null);
 
     try {
-      const { user, error } = await supabase.auth.signUp({
+      const response = await axios.post('http://127.0.0.1:8000/accounts/register/', {
         email,
+        username,  // Sending the username to the backend
         password,
       });
 
-      if (error) {
-        throw error;
+      if (response.data.message === "User registered successfully") {
+        navigate("/login"); // Redirect to login after successful sign-up
+      } else {
+        throw new Error("Something went wrong during registration");
       }
-
-      // Redirect to login or profile setup page after successful sign-up
-      navigate("/create-profile");
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -51,13 +52,22 @@ const SignUp = () => {
       <form onSubmit={handleSubmit} style={{ width: "100%", maxWidth: "400px" }}>
         <TextField
           fullWidth
+          label="Username"
+          type="text"
+          value={username}  // Bind username state
+          onChange={(e) => setUsername(e.target.value)} // Update username
+          required
+          margin="normal"
+          autoFocus
+        />
+        <TextField
+          fullWidth
           label="Email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           margin="normal"
-          autoFocus
         />
         <TextField
           fullWidth

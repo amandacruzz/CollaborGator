@@ -1,192 +1,34 @@
-// import React, { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { useAuth } from "../hooks/useAuth";
-// import supabase from "../supabaseClient";
-// import { Box, Button, Divider, Typography, CircularProgress, Grid } from "@mui/material";
-// import Navbar from "../components/Navbar"; // Import Navbar
-
-// const Profile = () => {
-//   const { user } = useAuth();
-//   const navigate = useNavigate();
-
-//   const [profile, setProfile] = useState(null);
-//   const [projects, setProjects] = useState([]);
-//   const [loading, setLoading] = useState(true);
-
-//   // Fetch user profile and projects
-//   useEffect(() => {
-//     const fetchProfileAndProjects = async () => {
-//       if (!user) {
-//         navigate("/login");
-//         return;
-//       }
-
-//       const { data: profileData, error: profileError } = await supabase
-//         .from("users")
-//         .select("*")
-//         .eq("id", user.id)
-//         .single();
-
-//       if (profileError) {
-//         console.error("Error fetching profile:", profileError);
-//         navigate("/create-profile");
-//         return;
-//       }
-
-//       setProfile(profileData);
-
-//       const { data: projectsData, error: projectsError } = await supabase
-//         .from("projects")
-//         .select("*")
-//         .eq("creator_id", user.id);
-
-//       if (projectsError) {
-//         console.error("Error fetching projects:", projectsError);
-//       } else {
-//         setProjects(projectsData);
-//       }
-
-//       setLoading(false);
-//     };
-
-//     fetchProfileAndProjects();
-//   }, [user, navigate]);
-
-//   if (loading) {
-//     return (
-//       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-//         <CircularProgress />
-//       </Box>
-//     );
-//   }
-
-//   return (
-//     <Box sx={{ maxWidth: "800px", margin: "50px auto", padding: "20px" }}>
-// 		{/* Add Navbar */}
-// 		<Navbar />
-	
-//       {/* Top Part: User Profile */}
-//       <Box sx={{ marginBottom: "30px" }}>
-//         <Typography variant="h4" gutterBottom>
-//           My Profile
-//         </Typography>
-//         <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-//           <strong>Name:</strong> {profile.full_name || "N/A"}
-//         </Typography>
-//         <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-//           <strong>Email:</strong> {profile.email}
-//         </Typography>
-//         <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-//           <strong>Bio:</strong> {profile.bio || "No bio set."}
-//         </Typography>
-//         <Button
-//           variant="contained"
-//           color="primary"
-//           onClick={() => navigate("/edit-profile")}
-//           sx={{ marginBottom: "20px" }}
-//         >
-//           Edit Profile
-//         </Button>
-//         <Divider />
-//       </Box>
-
-//       {/* Bottom Part: User's Projects */}
-//       <Box>
-//         <Typography variant="h5" gutterBottom>
-//           My Projects
-//         </Typography>
-//         {projects.length > 0 ? (
-//           <Grid container spacing={2}>
-//             {projects.map((project) => (
-//               <Grid item xs={12} key={project.id}>
-//                 <Box
-//                   sx={{
-//                     border: "1px solid #ddd",
-//                     borderRadius: "10px",
-//                     padding: "15px",
-//                     backgroundColor: "#f9f9f9",
-//                   }}
-//                 >
-//                   <Typography variant="h6" gutterBottom>
-//                     {project.title}
-//                   </Typography>
-//                   <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-//                     {project.description}
-//                   </Typography>
-//                   <Typography variant="body2" sx={{ color: "#666" }}>
-//                     Tags: {project.tags.join(" · ")}
-//                   </Typography>
-//                 </Box>
-//               </Grid>
-//             ))}
-//           </Grid>
-//         ) : (
-//           <Typography variant="body1">You haven’t created any projects yet.</Typography>
-//         )}
-//       </Box>
-//     </Box>
-//   );
-// };
-
-// export default Profile;
-
-
-
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import supabase from "../supabaseClient";
-import { Box, Button, Divider, Typography, CircularProgress, Grid, Card, CardContent, CardActions} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { Box, Typography, CircularProgress, Divider, Button } from "@mui/material";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 
 const Profile = () => {
-  const { user } = useAuth();
-  const { userId } = useParams(); // Retrieve userId from the URL
-  const navigate = useNavigate();
-
   const [profile, setProfile] = useState(null);
-  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
-  const isOwnProfile = user && user.id === userId; // Check if it's the logged-in user's profile
-
-  // Fetch user profile and projects
   useEffect(() => {
-    const fetchProfileAndProjects = async () => {
+    const fetchProfile = async () => {
       setLoading(true);
-
-      const { data: profileData, error: profileError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-        navigate("/404"); // Redirect to a 404 page if user doesn't exist
-        return;
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/accounts/profile/', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setProfile(response.data);
+      } catch (error) {
+        console.error("Error fetching profile", error);
+        navigate("/login"); // If the user is not logged in, redirect to login
       }
-
-      setProfile(profileData);
-
-      const { data: projectsData, error: projectsError } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("creator_id", userId);
-
-      if (projectsError) {
-        console.error("Error fetching projects:", projectsError);
-      } else {
-        setProjects(projectsData);
-      }
-
       setLoading(false);
     };
 
-    if (userId) {
-      fetchProfileAndProjects();
-    }
-  }, [userId, navigate]);
+    fetchProfile();
+  }, [navigate, token]);
 
   if (loading) {
     return (
@@ -198,85 +40,27 @@ const Profile = () => {
 
   return (
     <Box sx={{ maxWidth: "800px", margin: "50px auto", padding: "20px" }}>
-      {/* Add Navbar */}
       <Navbar />
+      <Typography variant="h4" gutterBottom>
+        {profile?.username}'s Profile
+      </Typography>
+      <Typography variant="body1">
+        <strong>Email:</strong> {profile?.email}
+      </Typography>
+      <Typography variant="body1">
+        <strong>Full Name:</strong> {profile?.full_name}
+      </Typography>
 
-      {/* Top Part: User Profile */}
-      <Box sx={{ marginBottom: "30px" }}>
-        <Typography variant="h4" gutterBottom>
-          {isOwnProfile ? "My Profile" : `${profile.full_name}'s Profile`}
-        </Typography>
-        <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-          <strong>Name:</strong> {profile.full_name || "N/A"}
-        </Typography>
-        <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-          <strong>Email:</strong> {isOwnProfile ? profile.email : "Hidden"}
-        </Typography>
-        <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-          <strong>Bio:</strong> {profile.bio || "No bio set."}
-        </Typography>
-        {isOwnProfile && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate("/edit-profile")}
-            sx={{ marginBottom: "20px" }}
-          >
-            Edit Profile
-          </Button>
-        )}
-        <Divider />
-      </Box>
+      <Divider sx={{ margin: "20px 0" }} />
 
-      {/* Bottom Part: User's Projects */}
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          My Projects
-        </Typography>
-        {projects.length > 0 ? (
-          <Grid container spacing={3}>
-            {projects.map((project) => (
-              <Grid item xs={12} key={project.id}>
-                <Card
-                  sx={{
-                    border: "1px solid #ddd",
-                    borderRadius: "10px",
-                    backgroundColor: "#f9f9f9",
-                    transition: "transform 0.2s ease",
-                    "&:hover": {
-                      transform: "scale(1.02)",
-                      boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {project.title}
-                    </Typography>
-                    <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-                      {project.description}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "#666" }}>
-                      Tags: {project.tags?.join(" · ") || "No tags"}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={() => navigate(`/project/${project.id}`)}
-                    >
-                      View Project
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        ) : (
-          <Typography variant="body1">You haven’t created any projects yet.</Typography>
-        )}
-      </Box>
+      <Button
+        variant="outlined"
+        color="secondary"
+        onClick={() => window.location.href = "/login"}
+        sx={{ mt: 2 }}
+      >
+        Log Out
+      </Button>
     </Box>
   );
 };

@@ -26,13 +26,13 @@ const Home = () => {
   }, []);
 
   const handleSearch = (query) => {
-	const lowercasedQuery = query.toLowerCase();
-	const filtered = projects.filter((project) =>
-	  project.title.toLowerCase().includes(lowercasedQuery) ||
-	  project.description.toLowerCase().includes(lowercasedQuery) ||
-	  project.tags.some((tag) => tag.toLowerCase().includes(lowercasedQuery)) // Check if any tag matches the query
-	);
-	setFilteredProjects(filtered);
+    const lowercasedQuery = query.toLowerCase();
+    const filtered = projects.filter((project) =>
+      project.title.toLowerCase().includes(lowercasedQuery) ||
+      project.description.toLowerCase().includes(lowercasedQuery) ||
+      project.tags.some((tag) => tag.toLowerCase().includes(lowercasedQuery)) // Check if any tag matches the query
+    );
+    setFilteredProjects(filtered);
   };
 
   return (
@@ -69,9 +69,9 @@ const Home = () => {
                   <Typography variant="body2" sx={{ marginTop: "10px", color: "#666" }}>
                     {project.description}
                   </Typography>
-				  <Typography variant="body2" sx={{ marginTop: "10px", color: "#666" }}>
-					{project.tags.join(" • ")}
-				  </Typography>
+                  <Typography variant="body2" sx={{ marginTop: "10px", color: "#666" }}>
+                    {project.tags.join(" • ")}
+                  </Typography>
                 </CardContent>
                 <CardActions>
                   <Button

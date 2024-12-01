@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Typography, Box, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import supabase from "../supabaseClient"; // Import your supabase client
+import axios from "axios"; // Ensure axios is imported
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,22 +16,24 @@ const Login = () => {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const response = await axios.post('http://127.0.0.1:8000/accounts/login/', {
         email,
         password,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
 
-      if (error) {
-        throw error;
+      if (response.status === 200) {
+        navigate("/");
       }
-
-      // Redirect to the home page or user's profile page after login
-      navigate("/");
     } catch (error) {
-      setError(error.message);
+      setError(error.response?.data?.error || 'Login failed');
       setLoading(false);
     }
   };
+
 
   return (
     <Box
