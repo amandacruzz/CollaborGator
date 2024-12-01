@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, Typography, Box, CircularProgress } from "@mui/material";
+import { TextField, Button, Typography, Box, CircularProgress } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import supabase from "../supabaseClient"; // Make sure to import your supabase client
 
