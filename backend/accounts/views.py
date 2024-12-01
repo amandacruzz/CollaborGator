@@ -26,7 +26,7 @@ def register(request):
             token, created = Token.objects.get_or_create(user=user)
             return JsonResponse({
                 'message': 'User registered successfully',
-                'token': token.key  # Return the token
+                'token': token.key  
             }, status=201)
         return JsonResponse({'error': 'Invalid data'}, status=400)
     return JsonResponse({'error': 'Invalid request method'}, status=405)
@@ -53,9 +53,9 @@ def login_view(request):
             token, created = Token.objects.get_or_create(user=user)
             return JsonResponse({
                 'message': 'Login successful',
-                'token': token.key  # Return the token
+                'token': token.key  
             }, status=200)
-        else:
+        else:   
             return JsonResponse({'error': 'Invalid login credentials'}, status=400)
     
     return JsonResponse({'error': 'Invalid request method'}, status=405)
