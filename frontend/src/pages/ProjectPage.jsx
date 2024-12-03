@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Card, CardContent, Typography, Button, CircularProgress, Chip } from "@mui/material";
+import { Box, Card, CardContent, Typography, Button, CircularProgress, Chip, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import Navbar from "../components/Navbar";
 import supabase from "../supabaseClient";
+import { useGetUserProfile } from "../hooks/useGetUserProfile";  // Import the useGetUserProfile hook
 
 const ProjectPage = () => {
   const { projectId } = useParams(); // Get project ID from URL params
-
-  console.log("Params:", projectId);
   const navigate = useNavigate();
+  const { profile, loading: profileLoading } = useGetUserProfile(); // Fetch user profile using the custom hook
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [openMessageDialog, setOpenMessageDialog] = useState(false);  // For controlling the message modal
+  const [messageContent, setMessageContent] = useState("");  // Content of the message
+  const [sendingMessage, setSendingMessage] = useState(false);  // For showing loading state when sending message
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -22,7 +25,6 @@ const ProjectPage = () => {
 
       if (error) {
         console.error("Error fetching project:", error);
-        //navigate("/404"); // Redirect to a 404 page if the project is not found
         return;
       }
 
@@ -31,9 +33,51 @@ const ProjectPage = () => {
     };
 
     fetchProject();
-  }, [projectId, navigate]);
+  }, [projectId]);
 
-  if (loading) {
+  const handleSendMessage = async () => {
+    if (!messageContent.trim()) {
+      alert("Message cannot be empty!");
+      return;
+    }
+  
+    setSendingMessage(true);
+    
+    try {
+      // Log the data that will be sent to the database for debugging
+      console.log("Sending message with the following data:");
+      console.log({
+        sender_id: profile.id,  // Logged-in user's ID
+        recipient_id: project.creator_id,  // Creator's ID
+        content: messageContent,  // The message content
+      });
+  
+      const { error } = await supabase.from("messages").insert([
+        {
+          sender_id: profile.id,  // Use profile.id from the useGetUserProfile hook
+          recipient_id: project.creator_id,
+          content: messageContent,
+        },
+      ]);
+  
+      if (error) {
+        console.error("Error sending message:", error);
+        alert("Error sending message.");
+      } else {
+        console.log("Message sent successfully!");  // Log success message
+        alert("Message sent successfully!");
+        setOpenMessageDialog(false); // Close the dialog after sending the message
+        setMessageContent(""); // Reset the message input
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      alert("Unexpected error occurred.");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  if (loading || profileLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
         <CircularProgress />
@@ -104,6 +148,30 @@ const ProjectPage = () => {
               {new Date(project.created_at).toLocaleDateString() || "Unknown"}
             </Typography>
           </Box>
+
+          {/* Button to navigate to creator's profile */}
+          {project.creator_id && (
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => navigate(`/profile/${project.creator_id}`)} // Navigate to creator's profile page
+              sx={{ marginTop: "20px" }}
+            >
+              View Creator's Profile
+            </Button>
+          )}
+
+          {/* Button to open message dialog */}
+          {profile && project.creator_id && (
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => setOpenMessageDialog(true)} // Open the message dialog
+              sx={{ marginTop: "20px" }}
+            >
+              Message the Creator
+            </Button>
+          )}
         </CardContent>
 
         <Button
@@ -117,6 +185,32 @@ const ProjectPage = () => {
           Back to Projects
         </Button>
       </Card>
+
+      {/* Message Dialog */}
+      <Dialog open={openMessageDialog} onClose={() => setOpenMessageDialog(false)}>
+        <DialogTitle>Message the Creator</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            multiline
+            rows={4}
+            label="Your Message"
+            variant="outlined"
+            fullWidth
+            value={messageContent}
+            onChange={(e) => setMessageContent(e.target.value)}
+            sx={{ marginBottom: "20px" }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenMessageDialog(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleSendMessage} color="primary" disabled={sendingMessage}>
+            {sendingMessage ? "Sending..." : "Send Message"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -81,42 +81,49 @@ const PostProject = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: "600px", margin: "50px auto", padding: "20px", border: "1px solid #ddd", borderRadius: "10px" }}>
+    <>
       {/* Add Navbar */}
       <Navbar />
+
+      <Box sx={{ maxWidth: "600px", margin: "50px auto", padding: "20px", border: "1px solid #ddd", borderRadius: "10px" }}>
+      
 	  
-	  <Typography variant="h4" align="center" gutterBottom>
-        Post a Project
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Project Title"
-          fullWidth
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          sx={{ marginBottom: "20px" }}
-        />
-        <TextField
-          label="Project Description"
-          fullWidth
-          multiline
-          rows={4}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          sx={{ marginBottom: "20px" }}
-        />
-        <TextField
-          label="Tags (comma-separated)"
-          fullWidth
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          sx={{ marginBottom: "20px" }}
-        />
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Post Project
-        </Button>
-      </form>
-    </Box>
+        <Typography variant="h4" align="center" gutterBottom>
+            Post a Project
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Project Title"
+              fullWidth
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              sx={{ marginBottom: "20px" }}
+            />
+            <TextField
+              label="Project Description"
+              fullWidth
+              multiline
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              sx={{ marginBottom: "20px" }}
+            />
+            <TextField
+              label="Tags (comma-separated)"
+              fullWidth
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              sx={{ marginBottom: "20px" }}
+            />
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              Post Project
+            </Button>
+          </form>
+        </Box>
+    
+    </>
+
+    
   );
 };
 
