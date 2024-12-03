@@ -4,8 +4,10 @@ import { Box, Card, CardContent, Typography, Button, CircularProgress, Chip, Tex
 import Navbar from "../components/Navbar";
 import supabase from "../supabaseClient";
 import { useGetUserProfile } from "../hooks/useGetUserProfile";  // Import the useGetUserProfile hook
+import { useAuth } from "../hooks/useAuth";
 
 const ProjectPage = () => {
+  const { user, loading: authLoading } = useAuth();
   const { projectId } = useParams(); // Get project ID from URL params
   const navigate = useNavigate();
   const { profile, loading: profileLoading } = useGetUserProfile(); // Fetch user profile using the custom hook
@@ -14,6 +16,26 @@ const ProjectPage = () => {
   const [openMessageDialog, setOpenMessageDialog] = useState(false);  // For controlling the message modal
   const [messageContent, setMessageContent] = useState("");  // Content of the message
   const [sendingMessage, setSendingMessage] = useState(false);  // For showing loading state when sending message
+
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      if (authLoading) return; // Wait for auth status to load
+      if (!user) {
+        navigate("/login"); // Redirect to login if not authenticated
+        return;
+      }
+
+      if (profileLoading) return; // Wait for profile loading to finish
+
+      if (!profile) {
+        navigate("/create-profile"); // Redirect to create profile if the profile doesn't exist
+        return;
+      }
+    }
+
+    checkUserStatus();
+  }, [authLoading, user, profileLoading, profile]);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -30,7 +52,7 @@ const ProjectPage = () => {
 
       setProject(data);
       setLoading(false);
-    };
+    }
 
     fetchProject();
   }, [projectId]);
@@ -77,7 +99,7 @@ const ProjectPage = () => {
     }
   };
 
-  if (loading || profileLoading) {
+  if (loading || profileLoading || authLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
         <CircularProgress />
@@ -86,10 +108,12 @@ const ProjectPage = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: "800px", margin: "50px auto", padding: "20px" }}>
+    <>
       {/* Add Navbar */}
       <Navbar />
 
+      <Box sx={{ maxWidth: "800px", margin: "50px auto", padding: "20px" }}>
+      
       <Card
         sx={{
           padding: "20px",
@@ -187,13 +211,22 @@ const ProjectPage = () => {
       </Card>
 
       {/* Message Dialog */}
-      <Dialog open={openMessageDialog} onClose={() => setOpenMessageDialog(false)}>
+      <Dialog
+        open={openMessageDialog}
+        onClose={() => setOpenMessageDialog(false)}
+        sx={{
+          "& .MuiDialog-paper": {
+            width: "600px", // Adjust width to make it larger
+            maxWidth: "90%", // Optional: to ensure it doesn't exceed the screen width
+          },
+        }}
+      >
         <DialogTitle>Message the Creator</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             multiline
-            rows={4}
+            rows={6} // Increase the number of rows to make the text box taller
             label="Your Message"
             variant="outlined"
             fullWidth
@@ -212,6 +245,10 @@ const ProjectPage = () => {
         </DialogActions>
       </Dialog>
     </Box>
+    
+    </>
+
+    
   );
 };
 
