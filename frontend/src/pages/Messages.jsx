@@ -1,5 +1,6 @@
+// export default Messages;
 import React, { useState, useEffect } from "react";
-import { Box, Button, TextField, Typography, Divider } from "@mui/material";
+import { Box, Button, TextField, Typography, Divider, CircularProgress } from "@mui/material";
 import supabase from "../supabaseClient"; // Ensure you have your supabase client configured here.
 import { useAuth } from "../hooks/useAuth";
 import Navbar from "../components/Navbar";
@@ -11,10 +12,13 @@ const Messages = () => {
   const [activeConversation, setActiveConversation] = useState(null);
   const [newMessage, setNewMessage] = useState("");
   const [userNames, setUserNames] = useState({});
+  const [loadingConversations, setLoadingConversations] = useState(true);
+  const [loadingUserNames, setLoadingUserNames] = useState(false);
 
   // Fetch conversations involving the logged-in user
   useEffect(() => {
     const fetchConversations = async () => {
+      setLoadingConversations(true);
       const { data, error } = await supabase
         .from("messages")
         .select("sender_id, recipient_id")
@@ -22,6 +26,7 @@ const Messages = () => {
 
       if (error) {
         console.error("Error fetching conversations:", error.message);
+        setLoadingConversations(false);
         return;
       }
 
@@ -33,32 +38,41 @@ const Messages = () => {
         )
       );
       setConversations(uniqueUserIds);
+      setLoadingConversations(false);
     };
 
     fetchConversations();
   }, [user.id]);
 
+  // Fetch user names for the conversations
   useEffect(() => {
+    if (conversations.length === 0) {
+      setLoadingUserNames(false);
+      return;
+    }
+
     const fetchUserNames = async () => {
+      setLoadingUserNames(true);
       const { data, error } = await supabase
-        .from('users')
-        .select('id, full_name')
-        .in('id', conversations);
+        .from("users")
+        .select("id, full_name")
+        .in("id", conversations);
 
       if (error) {
-        console.error('Error fetching user names:', error);
-      } else {
-        const userNamesMap = data.reduce((acc, user) => {
-          acc[user.id] = user.full_name;
-          return acc;
-        }, {});
-        setUserNames(userNamesMap);
+        console.error("Error fetching user names:", error);
+        setLoadingUserNames(false);
+        return;
       }
+
+      const userNamesMap = data.reduce((acc, user) => {
+        acc[user.id] = user.full_name;
+        return acc;
+      }, {});
+      setUserNames(userNamesMap);
+      setLoadingUserNames(false);
     };
 
-    if (conversations.length > 0) {
-      fetchUserNames();
-    }
+    fetchUserNames();
   }, [conversations]);
 
   // Fetch messages for the active conversation
@@ -108,7 +122,7 @@ const Messages = () => {
 
     // Cleanup subscription on component unmount or when active conversation changes
     return () => {
-		messageChannel.unsubscribe();
+      messageChannel.unsubscribe();
     };
   }, [activeConversation, user.id]);
 
@@ -147,22 +161,28 @@ const Messages = () => {
       <Box sx={{ display: "flex", height: "100vh" }}>
         <Box sx={{ width: "250px", borderRight: "1px solid #ccc", padding: "10px" }}>
           <Typography variant="h6">Conversations</Typography>
-          {conversations.map((conversationId) => (
-            <Button
-              key={conversationId}
-              fullWidth
-              onClick={() => setActiveConversation(conversationId)}
-              sx={{ marginBottom: "5px", textAlign: "left" }}
-            >
-              {userNames[conversationId] || `User ${conversationId}`}
-            </Button>
-          ))}
+          {loadingConversations ? (
+            <CircularProgress />
+          ) : (
+            conversations.map((conversationId) => (
+              <Button
+                key={conversationId}
+                fullWidth
+                onClick={() => setActiveConversation(conversationId)}
+                sx={{ marginBottom: "5px", textAlign: "left" }}
+              >
+                {loadingUserNames ? "Loading..." : userNames[conversationId] || `User ${conversationId}`}
+              </Button>
+            ))
+          )}
         </Box>
 
         <Box sx={{ flex: 1, padding: "10px" }}>
           {activeConversation ? (
             <>
-              <Typography variant="h6">Chat with User {activeConversation}</Typography>
+              <Typography variant="h6">
+                Chat with {userNames[activeConversation] || `User ${activeConversation}`}
+              </Typography>
               <Divider sx={{ margin: "10px 0" }} />
               <Box
                 sx={{
